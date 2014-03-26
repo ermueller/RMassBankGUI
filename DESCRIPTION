@@ -10,7 +10,6 @@ Description:
 License: Artistic-2.0
 SystemRequirements: tcl/tk
 Depends: RMassBank
-Imports: tcltk, tcltk2
+Imports: tcltk
 Suggests:
-
-Collate:
+Collate: 'zzz.R'
