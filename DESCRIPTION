@@ -1,0 +1,16 @@
+Package: RMassBankGUI
+Type: Package
+Title: A GUI for high level access for RMassBank
+Version: 0.0.1
+Authors@R: person(given = "Erik", family = "Muller", role =
+    "aut", email = "erik.mueller@student.uni-halle.de")
+Author: Erik Mueller
+Maintainer: RMassBank at Eawag <massbank@eawag.ch>
+Description: 
+License: Artistic-2.0
+SystemRequirements: tcl/tk
+Depends: RMassBank
+Imports: tcltk, tcltk2
+Suggests:
+
+Collate:
