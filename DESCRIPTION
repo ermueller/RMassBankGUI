@@ -1,7 +1,7 @@
 Package: RMassBankGUI
 Type: Package
 Title: A GUI for high level access for RMassBank
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person(given = "Erik", family = "Muller", role =
     "aut", email = "erik.mueller@student.uni-halle.de")
 Author: Erik Mueller
@@ -9,7 +9,11 @@ Maintainer: RMassBank at Eawag <massbank@eawag.ch>
 Description: 
 License: Artistic-2.0
 SystemRequirements: tcl/tk
-Depends: RMassBank
-Imports: tcltk
+Depends: RMassBank, tcltk
+Imports: 
 Suggests:
-Collate: 'zzz.R'
+Collate:
+	'SettingsGUI.R'
+	'Synchscroll.R'
+	'WorkflowGUI.R' 
+	'zzz.R'
