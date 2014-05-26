@@ -181,7 +181,6 @@ WorkflowGUI <- function(){
 	
 	##Labels
 	Filestext <- ttklabel(tt,text="Files:")
-	Filetabletext <- ttklabel(tt,text="File table:")
 	Settingstext <- ttklabel(tt,text="Settings:")
 	Compoundlisttext <- ttklabel(tt,text="Compound list:")
 	
@@ -199,36 +198,26 @@ WorkflowGUI <- function(){
 	##2nd row
 	tkgrid(xbar, column = 1, columnspan = 3, pady = c(0,10), padx = 0, sticky="new")
 	
-	
 	##3rd row
-	tkgrid(Filetabletext, pady = 5)
-	tkgrid(fileTable.entry, row = 2, column = 1, columnspan = 3, pady = 5)
-	tkgrid(choosefileTable.but, column = 5, row = 2, padx = 5, sticky = "w")
-	##CONF
-	tkgrid.configure(fileTable.entry, sticky = "new")
-	tkgrid.configure(Filetabletext, sticky="e")
-	
-	
-	##4th row
 	tkgrid(Settingstext, pady = 5)
-	tkgrid(settings.entry, row = 3, column = 1, columnspan = 3, pady = 5)
-	tkgrid(chooseSettings.but, column = 5, row = 3, padx = 5, sticky = "w")
+	tkgrid(settings.entry, row = 2, column = 1, columnspan = 3, pady = 5)
+	tkgrid(chooseSettings.but, column = 5, row = 2, padx = 5, sticky = "w")
 	##CONF
 	tkgrid.configure(settings.entry, sticky = "new")
 	tkgrid.configure(Settingstext, sticky="e")
 	
-	##5th row
+	##4th row
 	tkgrid(Compoundlisttext, pady = 5)
-	tkgrid(compoundList.entry, row = 4, column = 1, columnspan = 3, pady = 5)
-	tkgrid(choosecompoundList.but, column = 5, row = 4, padx = 5, sticky = "w")
+	tkgrid(compoundList.entry, row = 3, column = 1, columnspan = 3, pady = 5)
+	tkgrid(choosecompoundList.but, column = 5, row = 3, padx = 5, sticky = "w")
 	##CONF
 	tkgrid.configure(compoundList.entry, sticky = "new")
 	tkgrid.configure(Compoundlisttext, sticky="e")
 	
-	##6th row
+	##5th row
 	tkgrid(tklabel(tt, text = "Method of reading the \n files"), cBoxmethod, tklabel(tt, text = "Ionization mass:"), cBoxmode)
 	
-	##7th row
+	##6th row
 	tkgrid(example.but, submit.but, pady = c(30,0))
 	
 	
