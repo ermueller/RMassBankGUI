@@ -244,8 +244,8 @@ WorkflowGUI <- function(){
 		filemat <- as.matrix(read.csv(filename))
 		cpdID <- list()
 		guifiles <- list()
-		.Tcl(paste(.Tk.ID(lboxfiles), "delete 0 END"))
-		.Tcl(paste(.Tk.ID(lboxcpdID), "delete 0 END")) 
+		.Tcl(paste(.Tk.ID(lboxfiles), "delete 0 end"))
+		.Tcl(paste(.Tk.ID(lboxcpdID), "delete 0 end")) 
 		for(i in 1:nrow(filemat)){
 			tkinsert(lboxfiles, "end", filemat[i,"files"])
 			tkinsert(lboxcpdID, "end", filemat[i,"cpdID"])
