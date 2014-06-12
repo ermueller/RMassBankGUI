@@ -1,9 +1,11 @@
-require(tcltk)
 WorkflowGUI <- function(){
 	
 	##Initialize Variables
 	guifiles <- list()
 	cpdID <- list()
+	
+	##Dummy variables
+	dummyradio <- tclVar("NA")
 	
 	##SETTINGS GETS ITS OWN MENU
 	settings <- tclVar("")
@@ -16,7 +18,7 @@ WorkflowGUI <- function(){
 	mzmode <- tclVar("pH")
    
 	##Open the window
-	tt <- tktoplevel()
+	tt <- tktoplevel(height=100, width = 10)
 	tkwm.title(tt,"Interactive GUI for using the RMassBank Workflow")
 	
 	##Use the icon
@@ -35,7 +37,8 @@ WorkflowGUI <- function(){
 	
 	
 	##Listbox definition
-	lboxfiles <- tklistbox(tt, width = 60, borderwidth = 0 , height = 4 , selectmode = "multiple",  
+	lboxfiles <- tklistbox(tt, width = 60, borderwidth = 0 , height = 4 , selectmode = "multiple", 
+						xscrollcommand = function(...)tkset(xbar, ...),
 						yscrollcommand = function(...)pseudoSetScroll(ybar, ...), 
 						background = "white")
 	lboxcpdID <- tklistbox(tt, width = 20, borderwidth = 0 , height = 4 , selectmode = "multiple", 
@@ -50,8 +53,8 @@ WorkflowGUI <- function(){
 		}
 		index <- as.numeric(index)
 		if(!is.na(index)){
-			do.call(tkdelete,c(list(lboxfiles),as.list(index)))
-			do.call(tkdelete,c(list(lboxcpdID),as.list(index)))
+			sapply(rev(index), function(x){tkdelete(lboxfiles,x)})
+			sapply(rev(index), function(x){tkdelete(lboxcpdID,x)})
 			for(i in rev(index)){
 				guifiles[[i+1]] <<- NULL
 				cpdID[[i+1]] <<- NULL
@@ -66,8 +69,8 @@ WorkflowGUI <- function(){
 		}
 		index <- as.numeric(index)
 		if(!is.na(index)){
-			do.call(tkdelete,c(list(lboxfiles),as.list(index)))
-			do.call(tkdelete,c(list(lboxcpdID),as.list(index)))
+			sapply(rev(index), function(x){tkdelete(lboxfiles,x)})
+			sapply(rev(index), function(x){tkdelete(lboxcpdID,x)})
 			for(i in rev(index)){
 				guifiles[[i+1]] <<- NULL
 				cpdID[[i+1]] <<- NULL
@@ -78,7 +81,7 @@ WorkflowGUI <- function(){
 	##List box for compound IDs
 	ybarcpdID <- ttkscrollbar(tt, command = function(...)tkyview(lboxcpdID,...))
 	
-	cBoxmethod <- ttkcombobox(tt, state = "readonly", textvariable = rMethod, values = c("mzR", "xcms", "peaklists"))
+	cBoxmethod <- ttkcombobox(tt, state = "readonly", textvariable = rMethod, values = c("mzR", "xcms", "peaklist"))
 	cBoxmode <- ttkcombobox(tt, state = "readonly", textvariable = mzmode, values = c("pH", "mH"))
 	
 	choosefiles <- function(){
@@ -101,9 +104,24 @@ WorkflowGUI <- function(){
 	}
 	
 	chooseSettings <- function(){
-		SET <- tk_choose.files(multi = FALSE)
-		if(length(SET) > 0){
-			tclvalue(settings) <- SET
+		change <- TRUE
+		o <- getOption("RMassBank", NULL)
+		if(!is.null(o)){
+			change <- changeSettings()
+		}
+		if(change){
+			SET <- tk_choose.files(multi = FALSE)
+			if(length(SET) > 0){
+				tclvalue(settings) <- SET
+				p <- getOption("RMassBank")$xcms
+				loadRmbSettings(SET)
+				pp <- getOption("RMassBank")
+				pp$xcms <- p
+				options("RMassBank"=pp)
+				if(is.na(getOption("RMassBank")$deprofile)){
+					dummyradio <- tclVar("NA")
+				} else { dummyradio <- tclVar(getOption("RMassBank")$deprofile) }
+			}
 		}
 	}
 	
@@ -131,44 +149,61 @@ WorkflowGUI <- function(){
 			j <- 1
 			for(i in list.files(system.file("spectra", package = "RMassBankData", 
 								lib.loc = NULL, mustWork = TRUE),pattern=".mzML", full.names=TRUE)[1:2]){
-				guifiles[[j]] <- i
+				guifiles[[j]] <<- i
 				j <- j+1
 				tkinsert(lboxfiles,"end",basename(i))
 			}
 			
 			##cpdIDs
 			for(i in 2818:2819){
-				cpdID[[i-2817]] <- i
+				cpdID[[i-2817]] <<- i
+				tkinsert(lboxcpdID,"end",i)
 			}
 			
 			##settings
 			RmbSettingsTemplate("mysettings.ini")
 			
 			tclvalue(settings) <- "mysettings.ini"
-			print(guifiles)
+
 		} else {
 			tkmessageBox(message = "You need to install RMassBankData to show the example!")
 		}
 	}
 	
 	submit <- function(){
+		
+		m <- matrix("",length(guifiles),2)
+		colnames(m) <- c("files", "cpdID")
+		for(i in 1:length(guifiles)){
+			m[i,1] <- guifiles[[i]]
+			m[i,2] <- cpdID[[i]]
+		}
+		
+		write.csv(m, file="ftable.csv")
+		fileConn <- file("logfile.txt", open="w")
+		writeLines(as.yaml(getOption("RMassBank")), fileConn)
+		close(fileConn)
 		w <- newMsmsWorkspace()
 		ROfiles <- vector()
 		ROcpdid <- vector()
-		print(guifiles[[1]])
+		oo <- getOption("RMassBank")$xcms
 		for(i in 1:length(guifiles)){
-			ROfiles[i] <- tclvalue(guifiles[[i]])
-			ROcpdid[i] <- as.numeric(tclvalue(cpdID[[i]]))
+			ROfiles[i] <- guifiles[[i]]
+			ROcpdid[i] <- as.numeric(cpdID[[i]])
 		}
 		
-		Args <- list(method = "centWave", ppm = 5, snthresh = 1.5,
-                  peakwidth = c(20,60), integrate = 1, mzdiff = -0.001, mzCenterFun = "meanApex3")
+		Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
+                  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
 		loadRmbSettings(tclvalue(settings))
 		loadList(tclvalue(compoundList))
 		w <- msmsRead(w,files = ROfiles, cpdids = ROcpdid, readMethod = tclvalue(rMethod), mode = tclvalue(mzmode), 
 					confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
 					progressbar = "progressBarHook", MSe = FALSE)
 		w <- msmsWorkflow(w, steps=2:8)
+		w2 <- newMbWorkspace(w)
+		w2 <- mbWorkflow(w2, steps=1:2)
+		w2 <- loadInfolist(w2, "infolist.csv")
+		w2 <- mbWorkflow(w2, steps=3:8)
 	}
 	
 	choosefiles.but <- ttkbutton(tt, text = "Choose mz-files", command = choosefiles)
@@ -227,6 +262,8 @@ WorkflowGUI <- function(){
 	
 	##FILE MENU:
 	fileMenu <- tkmenu(topMenu, tearoff = FALSE)
+	
+	##TAB 1
 	filelistMenu <- tkmenu(fileMenu, tearoff = FALSE)
 	tkadd(filelistMenu, "command", label = "New...", command = function() {
 		filename <- tk_choose.files(multi = FALSE, filters = NULL, index = 1)
@@ -257,6 +294,50 @@ WorkflowGUI <- function(){
 	tkadd(fileMenu, "separator")
 	tkadd(fileMenu, "command", label = "Quit", command = function() tkdestroy(tt))
 	
+	
+	##TAB 2
+	optionsMenu <- tkmenu(fileMenu, tearoff = FALSE)
+	tkadd(optionsMenu, "command", label = "Edit RMassBank settings", command=function(){
+		SettingsGUI(tt)
+	})
+	tkadd(optionsMenu, "command", label = "Edit record annotations", command=function(){
+		##Add later
+	})
+	tkadd(optionsMenu, "command", label = "Edit xcms parameters", command=function(){
+		xcmsGUI(tt)
+	})
+	
+	##SUBTAB 1 (deprofile)
+	deprofileMenu <- tkmenu(fileMenu, tearoff = FALSE)
+	tkadd(deprofileMenu, "radiobutton", label = "None", value = "NA", variable=dummyradio, command=function(){
+		o <- getOption("RMassBank")
+		o$deprofile <- NA
+		options("RMassBank" = o)
+	})
+	tkadd(deprofileMenu, "radiobutton", label = "spline", value = "deprofile.spline", variable=dummyradio, command=function(){
+		o <- getOption("RMassBank")
+		o$deprofile <- "deprofile.spline"
+		options("RMassBank" = o)
+	})
+	tkadd(deprofileMenu, "radiobutton", label = "fwhm", value = "deprofile.fwhm", variable=dummyradio, command=function(){
+		o <- getOption("RMassBank")
+		o$deprofile <- "deprofile.fwhm"
+		options("RMassBank" = o)
+	})
+	tkadd(deprofileMenu, "radiobutton", label = "localMax", value = "deprofile.localMax", variable=dummyradio, command=function(){
+		o <- getOption("RMassBank")
+		o$deprofile <- "deprofile.localMax"
+		options("RMassBank" = o)
+	})
+	
+	tkadd(optionsMenu, "cascade", label = "Deprofiling options", menu=deprofileMenu)
+	tkadd(optionsMenu, "command", label = "RT Shift/Margin", command=function(){
+		RTGUI(tt)
+	})
+	tkadd(optionsMenu, "command", label = "Edit spectra list", command=function(){
+		SLGUI(tt)
+	})
+	
 	tkadd(topMenu, "cascade", label = "File", menu = fileMenu)
-
+	tkadd(topMenu, "cascade", label = "Settings", menu = optionsMenu)
 }

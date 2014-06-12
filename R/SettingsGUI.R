@@ -1,5 +1,4 @@
-WorkflowGUI <- function(tlwindow){
-	require(tcltk)
+SettingsGUI <- function(tlwindow){
 	
 	##Initialize Variables
 	##???
