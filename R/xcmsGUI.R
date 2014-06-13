@@ -6,13 +6,13 @@ xcmsGUI <- function(tlwindow){
 	#scaleppm <- tkwidget(parent=tt2, type="ttk::scale", label= "Dinkidongdungbam", showvalue=TRUE, from = 0, to = 100, orient = "horizontal", variable = XCMSEnv$ppm)
 	
 	XCMSDUMMY <- new.env()
-	XCMSDUMMY$ppm <- tclVar(as.numeric(XCMSEnv$ppm))
-	XCMSDUMMY$peakwidthstart <- tclVar(as.numeric(XCMSEnv$peakwidthstart) * 10)
-	XCMSDUMMY$peakwidthend <- tclVar(as.numeric(XCMSEnv$peakwidthend) * 10)
-	XCMSDUMMY$snthresh <- tclVar(as.numeric(XCMSEnv$snthresh) * 5)
-	XCMSDUMMY$prefilterpeaks <- tclVar(as.numeric(XCMSEnv$prefilterpeaks))
-	XCMSDUMMY$prefilterintensity <- tclVar(as.numeric(XCMSEnv$prefilterintensity))
-	XCMSDUMMY$mzdiff <- tclVar(as.numeric(XCMSEnv$mzdiff) * 1000)
+	XCMSDUMMY$ppm <- tclVar(as.numeric(tclvalue(XCMSEnv$ppm)))
+	XCMSDUMMY$peakwidthstart <- tclVar(as.numeric(tclvalue(XCMSEnv$peakwidthstart)) * 10)
+	XCMSDUMMY$peakwidthend <- tclVar(as.numeric(tclvalue(XCMSEnv$peakwidthend)) * 10)
+	XCMSDUMMY$snthresh <- tclVar(as.numeric(tclvalue(XCMSEnv$snthresh)) * 5)
+	XCMSDUMMY$prefilterpeaks <- tclVar(as.numeric(tclvalue(XCMSEnv$prefilterpeaks)))
+	XCMSDUMMY$prefilterintensity <- tclVar(as.numeric(tclvalue(XCMSEnv$prefilterintensity)))
+	XCMSDUMMY$mzdiff <- tclVar(as.numeric(tclvalue(XCMSEnv$mzdiff)) * 1000)
 	XCMSDUMMY$fitGauss <- tclVar("FALSE")
 	scaleppm <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 100, variable = XCMSDUMMY$ppm, orient = "horizontal",
 		command=function(x, ...){ 

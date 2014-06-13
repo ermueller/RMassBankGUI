@@ -18,8 +18,10 @@ WorkflowGUI <- function(){
 	mzmode <- tclVar("pH")
    
 	##Open the window
-	tt <- tktoplevel(height=100, width = 10)
+	tt <- tktoplevel(height=400, width = 900)
 	tkwm.title(tt,"Interactive GUI for using the RMassBank Workflow")
+	tkgrid.propagate(tt,1)
+
 	
 	##Use the icon
 	##tkwm.iconbitmap(tt, "something.ico")
@@ -206,10 +208,10 @@ WorkflowGUI <- function(){
 		w2 <- mbWorkflow(w2, steps=3:8)
 	}
 	
-	choosefiles.but <- ttkbutton(tt, text = "Choose mz-files", command = choosefiles)
-	editcpdID.but <- ttkbutton(tt, text = "Edit compound IDs", command = editcpdID)
-	chooseSettings.but <- ttkbutton(tt, text = "Choose the file settings", command = chooseSettings)
-	choosecompoundList.but <- ttkbutton(tt, text = "Choose the compound list", command = choosecompoundList)
+	choosefiles.but <- ttkbutton(tt, text = "Choose mz-files", command = choosefiles, width=25)
+	editcpdID.but <- ttkbutton(tt, text = "Edit compound IDs", command = editcpdID, width=25)
+	chooseSettings.but <- ttkbutton(tt, text = "Choose the file settings", command = chooseSettings, width=25)
+	choosecompoundList.but <- ttkbutton(tt, text = "Choose the compound list", command = choosecompoundList, width=25)
 	example.but <- ttkbutton(tt, text = "Example Workflow", command = example)
 	submit.but <- ttkbutton(tt, text = "Submit", command = submit)
 	
@@ -219,12 +221,18 @@ WorkflowGUI <- function(){
 	Settingstext <- ttklabel(tt,text="Settings:")
 	Compoundlisttext <- ttklabel(tt,text="Compound list:")
 	
+	##IMAGE
+	fpath <- system.file("cosmetics/RMassBank_logo.gif", package="RMassBankGUI")
+	iconName <- "::tcl::logo"
+	i1 <- tkimage.create("photo", iconName, file=fpath)
+	a <- ttklabel(tt,image=iconName)
 	
 	##1st row
 	tkgrid(Filestext, lboxfiles,  pady = c(10,0))
 	tkgrid(lboxcpdID, pady = c(10,0), row = 0, column = 3, sticky = "sew")
 	tkgrid(ybar, pady = c(10,0), row = 0, column = 4, sticky = "w", padx = c(0,10))
 	tkgrid(choosefiles.but, row = 0, column = 5, padx = 5, pady = c(10,0), sticky = "w")
+	tkgrid(a, row = 0, column = 5)
 	tkgrid.configure(Filestext, sticky = "e")
 	tkgrid.configure(lboxfiles, columnspan = 2, sticky = "sew", padx = c(0,0))
 	#tkgrid.configure(ybar, sticky = "w", padx = c(0,10))
@@ -253,8 +261,20 @@ WorkflowGUI <- function(){
 	tkgrid(tklabel(tt, text = "Method of reading the \n files"), cBoxmethod, tklabel(tt, text = "Ionization mass:"), cBoxmode)
 	
 	##6th row
-	tkgrid(example.but, submit.but, pady = c(30,0))
+	tkgrid(submit.but, row = 5, column = 1, pady = c(10,0))
 	
+	tkgrid.columnconfigure(tt, 0, weight = 1)
+	tkgrid.columnconfigure(tt, 1, weight = 1)
+	tkgrid.columnconfigure(tt, 2, weight = 1)
+	tkgrid.columnconfigure(tt, 3, weight = 1)
+	tkgrid.columnconfigure(tt, 4, weight = 1)
+	tkgrid.columnconfigure(tt, 5, weight = 1)
+	tkgrid.rowconfigure(tt, 0, weight = 1)
+	tkgrid.rowconfigure(tt, 1, weight = 1)
+	tkgrid.rowconfigure(tt, 2, weight = 1)
+	tkgrid.rowconfigure(tt, 3, weight = 1)
+	tkgrid.rowconfigure(tt, 4, weight = 1)
+	tkgrid.rowconfigure(tt, 5, weight = 1)
 	
 	##TOP MENU:
 	topMenu <- tkmenu(tt) # Create a menu
