@@ -175,7 +175,7 @@ WorkflowGUI <- function(){
 	submit <- function(){
 		
 		m <- matrix("",length(guifiles),2)
-		colnames(m) <- c("files", "cpdID")
+		colnames(m) <- c("Files", "ID")
 		for(i in 1:length(guifiles)){
 			m[i,1] <- guifiles[[i]]
 			m[i,2] <- cpdID[[i]]
@@ -293,10 +293,10 @@ WorkflowGUI <- function(){
 		.Tcl(paste(.Tk.ID(lboxfiles), "delete 0 end"))
 		.Tcl(paste(.Tk.ID(lboxcpdID), "delete 0 end")) 
 		for(i in 1:nrow(filemat)){
-			tkinsert(lboxfiles, "end", filemat[i,"files"])
-			tkinsert(lboxcpdID, "end", filemat[i,"cpdID"])
-			guifiles[[i]] <<- filemat[i,"files"]
-			cpdID[[i]] <<- filemat[i,"cpdID"]
+			tkinsert(lboxfiles, "end", filemat[i,"Files"])
+			tkinsert(lboxcpdID, "end", filemat[i,"ID"])
+			guifiles[[i]] <<- filemat[i,"Files"]
+			cpdID[[i]] <<- filemat[i,"ID"]
 		}
 	})
 	tkadd(filelistMenu, "command", label = "Append to current files", command = function() {
@@ -304,10 +304,10 @@ WorkflowGUI <- function(){
 		filemat <- as.matrix(read.csv(filename))
 		lfiles <- length(guifiles)
 		for(i in 1:nrow(filemat)){
-			guifiles[[lfiles+i]] <<- filemat[i,"files"]
-			cpdID[[lfiles+i]] <<- filemat[i,"cpdID"]
-			tkinsert(lboxfiles, "end", filemat[i,"files"])
-			tkinsert(lboxcpdID, "end", filemat[i,"cpdID"])
+			guifiles[[lfiles+i]] <<- filemat[i,"Files"]
+			cpdID[[lfiles+i]] <<- filemat[i,"ID"]
+			tkinsert(lboxfiles, "end", filemat[i,"Files"])
+			tkinsert(lboxcpdID, "end", filemat[i,"ID"])
 		}
 	})
 	tkadd(fileMenu, "cascade", label = "Import file table...", menu = filelistMenu)
