@@ -1,109 +1,22 @@
-xcmsGUI <- function(tlwindow){
+xcmsGUI <- function(){
 	
-	##Open the window
-	tt2 <- tktoplevel(tlwindow)
-	tkwm.title(tt2,"Edit xcms Parameters(Only centwave)")
+	initXCMS()
 	#scaleppm <- tkwidget(parent=tt2, type="ttk::scale", label= "Dinkidongdungbam", showvalue=TRUE, from = 0, to = 100, orient = "horizontal", variable = XCMSEnv$ppm)
-	
-	XCMSDUMMY <- new.env()
-	XCMSDUMMY$ppm <- tclVar(as.numeric(tclvalue(XCMSEnv$ppm)))
-	XCMSDUMMY$peakwidthstart <- tclVar(as.numeric(tclvalue(XCMSEnv$peakwidthstart)) * 10)
-	XCMSDUMMY$peakwidthend <- tclVar(as.numeric(tclvalue(XCMSEnv$peakwidthend)) * 10)
-	XCMSDUMMY$snthresh <- tclVar(as.numeric(tclvalue(XCMSEnv$snthresh)) * 5)
-	XCMSDUMMY$prefilterpeaks <- tclVar(as.numeric(tclvalue(XCMSEnv$prefilterpeaks)))
-	XCMSDUMMY$prefilterintensity <- tclVar(as.numeric(tclvalue(XCMSEnv$prefilterintensity)))
-	XCMSDUMMY$mzdiff <- tclVar(as.numeric(tclvalue(XCMSEnv$mzdiff)) * 1000)
-	XCMSDUMMY$fitGauss <- tclVar("FALSE")
-	scaleppm <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 100, variable = XCMSDUMMY$ppm, orient = "horizontal",
-		command=function(x, ...){ 
-			tclvalue(XCMSEnv$ppm) <- (floor(as.numeric(...)))
-			oo <- getOption("RMassBank")
-			oo$xcms$ppm <- (floor(as.numeric(...)))
-			options("RMassBank" = oo)
-		})
-	scalepwstart <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 1000, variable = XCMSDUMMY$peakwidthstart, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$peakwidthstart) <- (floor(as.numeric(...)) / 10)
-			oo <- getOption("RMassBank")
-			oo$xcms$peakwidth[1] <- (floor(as.numeric(...)) / 10)
-			options("RMassBank" = oo)
-		})
-	scalepwend <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 1000, variable = XCMSDUMMY$peakwidthend, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$peakwidthend) <- (floor(as.numeric(...)) / 10)
-			oo <- getOption("RMassBank")
-			oo$xcms$peakwidth[2] <- (floor(as.numeric(...)) / 10)
-			options("RMassBank" = oo)
-		})
-	scalesnthresh <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 100, variable = XCMSDUMMY$snthresh, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$snthresh) <- (floor(as.numeric(...)) / 5)
-			oo <- getOption("RMassBank")
-			oo$xcms$snthresh <- (floor(as.numeric(...)) / 5)
-			options("RMassBank" = oo)
-		})
-	scalepfpeaks <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 10, variable = XCMSDUMMY$prefilterpeaks, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$prefilterpeaks) <- (floor(as.numeric(...)))
-			oo <- getOption("RMassBank")
-			oo$xcms$prefilter[1] <- (floor(as.numeric(...)))
-			options("RMassBank" = oo)
-		})
-	scalepfint <- tkwidget(parent=tt2, type="ttk::scale", from = 0, to = 1000, variable = XCMSDUMMY$prefilterintensity, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$prefilterintensity) <- (floor(as.numeric(...)))
-			oo <- getOption("RMassBank")
-			oo$xcms$prefilter[2] <- (floor(as.numeric(...)))
-			options("RMassBank" = oo)
-		})
-	scalemzdiff <- tkwidget(parent=tt2, type="ttk::scale", from = -1000, to = 1000, variable = XCMSDUMMY$mzdiff, orient = "horizontal", 
-		command=function(x, ...){
-			tclvalue(XCMSEnv$mzdiff) <- (floor(as.numeric(...)) / 1000)
-			oo <- getOption("RMassBank")
-			oo$xcms$mzdiff <- (floor(as.numeric(...)) / 1000)
-			options("RMassBank" = oo)
-		})
-	
-	
-	ppmentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$ppm, width=6)
-	peakwidthstartentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$peakwidthstart, width=6)
-	peakwidthendentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$peakwidthend, width=6)
-	snthreshentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$snthresh, width=6)
-	pfpeaksentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$prefilterpeaks, width=6)
-	pfintentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$prefilterintensity, width=6)
-	mzdiffentry <- ttkentry(parent=tt2, textvariable=XCMSEnv$mzdiff, width=6)
-	integratebutton <- ttkcheckbutton(parent = tt2, variable = XCMSEnv$integrate, onvalue = 2, offvalue = 1, 
-		command=function(x, ...){
-			oo <- getOption("RMassBank")
-			oo$xcms$integrate <- as.numeric(tclvalue(XCMSEnv$integrate))
-			options("RMassBank" = oo)
-		})
-	
-	
-	ppmlabel <- ttklabel(parent = tt2, text="Tolerated m/z deviation (ppm)")
-	pwslabel <- ttklabel(parent = tt2, text="Minimal peak width (s)")
-	pwelabel <- ttklabel(parent = tt2, text="Maximal peak width (s)")
-	sntlabel <- ttklabel(parent = tt2, text="Signal to noise ratio cutoff")
-	pfplabel <- ttklabel(parent = tt2, text="Minimum number of peaks in mass trace")
-	pfilabel <- ttklabel(parent = tt2, text="Minimum intensity of peaks")
-	mzdlabel <- ttklabel(parent = tt2, text="Minimum difference in m/z for peaks")
-	itglabel <- ttklabel(parent = tt2, text="Use real data for finding peak limits?")
-	
-	tkgrid(ppmlabel, scaleppm)
-	tkgrid(ppmentry, row=0, column=2, sticky = "w")
-	tkgrid(pwslabel, scalepwstart)
-	tkgrid(peakwidthstartentry, row=1, column=2, sticky = "w")
-	tkgrid(pwelabel, scalepwend)
-	tkgrid(peakwidthendentry, row=2, column=2, sticky = "w")
-	tkgrid(sntlabel, scalesnthresh)
-	tkgrid(snthreshentry, row=3, column=2, sticky = "w")
-	tkgrid(pfplabel, scalepfpeaks)
-	tkgrid(pfpeaksentry, row=4, column=2, sticky = "w")
-	tkgrid(pfilabel, scalepfint)
-	tkgrid(pfintentry, row=5, column=2, sticky = "w")
-	tkgrid(mzdlabel, scalemzdiff)
-	tkgrid(mzdiffentry, row=6, column=2, sticky = "w")
-	tkgrid(itglabel, integratebutton)
+	tkgrid(ObjectEnv$ppmlabel, ObjectEnv$scaleppm)
+	tkgrid(ObjectEnv$ppmentry, row=0, column=2, sticky = "w")
+	tkgrid(ObjectEnv$pwslabel, ObjectEnv$scalepwstart)
+	tkgrid(ObjectEnv$peakwidthstartentry, row=1, column=2, sticky = "w")
+	tkgrid(ObjectEnv$pwelabel, ObjectEnv$scalepwend)
+	tkgrid(ObjectEnv$peakwidthendentry, row=2, column=2, sticky = "w")
+	tkgrid(ObjectEnv$sntlabel, ObjectEnv$scalesnthresh)
+	tkgrid(ObjectEnv$snthreshentry, row=3, column=2, sticky = "w")
+	tkgrid(ObjectEnv$pfplabel, ObjectEnv$scalepfpeaks)
+	tkgrid(ObjectEnv$pfpeaksentry, row=4, column=2, sticky = "w")
+	tkgrid(ObjectEnv$pfilabel, ObjectEnv$scalepfint)
+	tkgrid(ObjectEnv$pfintentry, row=5, column=2, sticky = "w")
+	tkgrid(ObjectEnv$mzdlabel, ObjectEnv$scalemzdiff)
+	tkgrid(ObjectEnv$mzdiffentry, row=6, column=2, sticky = "w")
+	tkgrid(ObjectEnv$itglabel, ObjectEnv$integratebutton)
 }
 
 RTGUI <- function(tlwindow){
@@ -333,3 +246,4 @@ addSpecGUI <- function(tlwind){
 	
 	tkgrid(addb, row=2, column = 1, columnspan=2)
 }
+
