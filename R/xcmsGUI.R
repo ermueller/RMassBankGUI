@@ -26,8 +26,8 @@ RTGUI <- function(tlwindow){
 	oo <- getOption("RMassBank")
 	
 	RTEnv <- new.env()
-	RTEnv$margin <- tclVar(0)
-	RTEnv$shift <- tclVar(0)
+	RTEnv$margin <- tclVar(oo$rtMargin)
+	RTEnv$shift <- tclVar(oo$rtShift)
 	
 	RTDUMMYEnv <- new.env()
 	RTDUMMYEnv$margin <- tclVar(as.numeric(oo$rtMargin)*10)
@@ -226,24 +226,24 @@ SLGUI <- function(tlwindow){
 	tkgrid(addbutton, row=4, column = 1, columnspan=2)
 }
 
-addSpecGUI <- function(tlwind){
-	tt5 <- tktoplevel(tlwind)
-	tkwm.title(tt5, "Add new spectrum")
+# addSpecGUI <- function(tlwind){
+	# tt5 <- tktoplevel(tlwind)
+	# tkwm.title(tt5, "Add new spectrum")
 	
 	
 	
-	mlabel <- ttklabel(parent = tt5, text="Mode")
-	CElabel <- ttklabel(parent = tt5, text="CE")
-	CESlabel <- ttklabel(parent = tt5, text="CES")
-	RESlabel <- ttklabel(parent = tt5, text="Res")
+	# mlabel <- ttklabel(parent = tt5, text="Mode")
+	# CElabel <- ttklabel(parent = tt5, text="CE")
+	# CESlabel <- ttklabel(parent = tt5, text="CES")
+	# RESlabel <- ttklabel(parent = tt5, text="Res")
 	
-	addb <- ttkbutton(parent=tt5, text="Add spectrum", command = function(...){
+	# addb <- ttkbutton(parent=tt5, text="Add spectrum", command = function(...){
 		
-		tkdestroy(tt5)
-	})
+		# tkdestroy(tt5)
+	# })
 	
-	tkgrid(mlabel, CElabel, CESlabel, RESlabel, padx=c(0,0))
+	# tkgrid(mlabel, CElabel, CESlabel, RESlabel, padx=c(0,0))
 	
-	tkgrid(addb, row=2, column = 1, columnspan=2)
-}
+	# tkgrid(addb, row=2, column = 1, columnspan=2)
+# }
 

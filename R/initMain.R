@@ -5,8 +5,7 @@ ObjectEnv <- new.env()
 
 initMain <- function(){
 	Scrolls()			##Initialize Scrolling commands for tcl/tk
-	initWorkflowEnv()	##Variables for main Window
-	initXCMSEnv()		##Variables for XCMS Parameters
+	##initXCMSEnv()		##Variables for XCMS Parameters
 	initMainWindow()	##Initialize the main window
 	initEntries()		##Initialize entries for main window
 	initLabels()		##Initialize labels for main window
@@ -15,6 +14,50 @@ initMain <- function(){
 	initCboxes()		##Initialize comboboxes for main window
 	initButtons()		##Initialize buttons for main window
 }
+
+resetMain <- function(){
+
+	##Variables
+	tclvalue(WorkflowEnv$compoundList) <- ""
+	tclvalue(WorkflowEnv$rMethod) <- "mzR"
+	tclvalue(WorkflowEnv$mzmode) <- "pH"
+	WorkflowEnv$guifiles <- vector()
+	WorkflowEnv$cpdID <- vector()
+	tclvalue(WorkflowEnv$settings) <- ""
+	tclvalue(WorkflowEnv$compoundList) <- ""
+	
+	##Listboxes
+	.Tcl(paste(.Tk.ID(ObjectEnv$lboxfiles), "delete 0 end"))
+	.Tcl(paste(.Tk.ID(ObjectEnv$lboxcpdID), "delete 0 end"))
+	
+	##XCMS Variables
+	tclvalue(XCMSEnv$ppm) <- 25
+	tclvalue(XCMSEnv$peakwidthstart) <-20
+	tclvalue(XCMSEnv$peakwidthend) <- 50
+	tclvalue(XCMSEnv$snthresh) <- 10
+	tclvalue(XCMSEnv$prefilterpeaks) <- 3
+	tclvalue(XCMSEnv$prefilterintensity) <- 100
+	tclvalue(XCMSEnv$method) <- "centWave"
+	tclvalue(XCMSEnv$mzCenterFun) <- "wMeanApex3"
+	tclvalue(XCMSEnv$integrate) <- 1
+	tclvalue(XCMSEnv$mzdiff) <- -0.001
+	tclvalue(XCMSEnv$fitGauss) <- "FALSE"
+	updateXCMSoptions()
+	
+	##XCMS Dummy variables
+	# tclvalue(XCMSDUMMY$ppm) <- as.numeric(tclvalue(XCMSEnv$ppm))
+	# tclvalue(XCMSDUMMY$peakwidthstart) <- as.numeric(tclvalue(XCMSEnv$peakwidthstart)) * 10
+	# tclvalue(XCMSDUMMY$peakwidthend) <- as.numeric(tclvalue(XCMSEnv$peakwidthend)) * 10
+	# tclvalue(XCMSDUMMY$snthresh) <- as.numeric(tclvalue(XCMSEnv$snthresh)) * 5
+	# tclvalue(XCMSDUMMY$prefilterpeaks) <- as.numeric(tclvalue(XCMSEnv$prefilterpeaks))
+	# tclvalue(XCMSDUMMY$prefilterintensity) <- as.numeric(tclvalue(XCMSEnv$prefilterintensity))
+	# tclvalue(XCMSDUMMY$mzdiff) <- as.numeric(tclvalue(XCMSEnv$mzdiff)) * 1000
+	# tclvalue(XCMSDUMMY$fitGauss) <- as.logical(tclvalue(XCMSEnv$fitGauss))
+	
+	
+	
+}
+
 
 initWorkflowEnv <- function(){
 	##Environment for main GUI
@@ -25,6 +68,7 @@ initWorkflowEnv <- function(){
 	WorkflowEnv$cpdID <- vector()
 	WorkflowEnv$settings <- tclVar("")
 	WorkflowEnv$compoundList <- tclVar("")
+	WorkflowEnv$dummyradio <- tclVar("NA")
 }
 
 initXCMSEnv <- function(){
@@ -40,12 +84,11 @@ initXCMSEnv <- function(){
 	XCMSEnv$integrate <- tclVar(1)
 	XCMSEnv$mzdiff <- tclVar(-0.001)
 	XCMSEnv$fitGauss <- tclVar("FALSE")
-	updateXCMSoptions()
 }
 
 initMainWindow <- function(){
 	ObjectEnv$tt <- tktoplevel(height=400, width = 900)  ##Create window
-	tkwm.title(ObjectEnv$tt,"Interactive GUI for using the RMassBank Workflow") ##Window title
+	tkwm.title(ObjectEnv$tt,currentProjectEnv$currentProject) ##Window title
 	tkgrid.propagate(ObjectEnv$tt,1)
 }
 
@@ -84,6 +127,7 @@ initCboxes <- function(){
 	##Comboboxes for main GUI
 	ObjectEnv$cBoxmethod <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$rMethod, values = c("mzR", "xcms", "peaklist"))
 	ObjectEnv$cBoxmode <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$mzmode, values = c("pH", "mH"))
+	#ObjectEnv$cBoxsteps <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$steps, values = 1:8
 }
 
 initButtons <- function(){
@@ -161,35 +205,33 @@ initButtons <- function(){
 	}
 	
 	submit <- function(){
-		
-		m <- matrix(c(WorkflowEnv$guifiles,WorkflowEnv$cpdID),length(WorkflowEnv$guifiles),2,
-			dimnames=list(rep("",length(WorkflowEnv$guifiles)),c("Files","ID")))
-
-		write.csv(m, file="ftable.csv")
-
-		fileConn <- file("logfile.txt", open="w")
-		writeLines(as.yaml(getOption("RMassBank")), fileConn)
-		close(fileConn)
-		
-		w <- newMsmsWorkspace()
 		updateXCMSoptions()
-		
-		oo <- getOption("RMassBank")$xcms
-		Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
-                  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
-		
-		loadRmbSettings(tclvalue(WorkflowEnv$settings))
-		w <- msmsRead(w,files = WorkflowEnv$guifiles, cpdids = WorkflowEnv$cpdID, readMethod = tclvalue(WorkflowEnv$rMethod), mode = tclvalue(WorkflowEnv$mzmode), 
-					confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
-					progressbar = "progressBarHook", MSe = FALSE)
-		w <- msmsWorkflow(w, steps=2:8)
-		w2 <- newMbWorkspace(w)
-		w2 <- mbWorkflow(w2, steps=1:2)
-		w2 <- loadInfolist(w2, "infolist.csv")
-		w2 <- mbWorkflow(w2, steps=3:8)
+		if(tclvalue(WorkflowEnv$compoundList)!=""){
+			o <- getOption("RMassBank")
+			if(!is.null(o$xcms)){
+				w <- newMsmsWorkspace()
+				loadList(tclvalue(WorkflowEnv$compoundList))
+				oo <- o$xcms
+				Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
+						  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
+				print(WorkflowEnv$guifiles)
+				print(WorkflowEnv$cpdID)
+				print(tclvalue(WorkflowEnv$rMethod))
+				print(tclvalue(WorkflowEnv$mzmode))
+				print(Args)
+				w <- msmsRead(w,files = WorkflowEnv$guifiles, cpdids = WorkflowEnv$cpdID, readMethod = tclvalue(WorkflowEnv$rMethod), mode = tclvalue(WorkflowEnv$mzmode), 
+							confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
+							progressbar = "progressBarHook", MSe = FALSE)
+				w <- msmsWorkflow(w, steps=2:8)
+				w2 <- newMbWorkspace(w)
+				w2 <- mbWorkflow(w2, steps=1:2)
+				w2 <- loadInfolist(w2, "infolist.csv")
+				w2 <- mbWorkflow(w2, steps=3:8)
+			}
+		}
 	}
+	
 	ObjectEnv$choosefiles.but <- ttkbutton(ObjectEnv$tt, text = "Choose mz-files", command = choosefiles, width=25)
-	#ObjectEnv$editcpdID.but <- ttkbutton(ObjectEnv$tt, text = "Edit compound IDs", command = editcpdID, width=25)
 	ObjectEnv$chooseSettings.but <- ttkbutton(ObjectEnv$tt, text = "Choose the file settings", command = chooseSettings, width=25)
 	ObjectEnv$choosecompoundList.but <- ttkbutton(ObjectEnv$tt, text = "Choose the compound list", command = choosecompoundList, width=25)
 	ObjectEnv$example.but <- ttkbutton(ObjectEnv$tt, text = "Example Workflow", command = example)
@@ -197,7 +239,7 @@ initButtons <- function(){
 }
 
 initMenus <- function(){
-
+	
 }
 
 updateXCMSoptions <- function(){

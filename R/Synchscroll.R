@@ -36,4 +36,3 @@ changeSettings <- function(){
 		return(TRUE)
 	} else{return(FALSE)}
 }
-

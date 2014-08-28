@@ -1,11 +1,9 @@
 WorkflowGUI <- function(){
-	
-	##Initialize Variables
-	initMain()		##Initialize objects on the grid
-	
-	##Dummy variables
-	ObjectEnv$dummyradio <- tclVar("NA")
 
+	##Dummy variables
+	initMain()
+	updateXCMSoptions()
+	
 	##IMAGE
 	#fpath <- system.file("cosmetics/RMassBank_logo.gif", package="RMassBankGUI")
 	#iconName <- "::tcl::logo"
@@ -45,8 +43,8 @@ WorkflowGUI <- function(){
 	##5th row
 	tkgrid(tklabel(ObjectEnv$tt, text = "Method of reading the \n files"), ObjectEnv$cBoxmethod, tklabel(ObjectEnv$tt, text = "Ionization mass:"), ObjectEnv$cBoxmode)
 	
-	##6th row
-	tkgrid(ObjectEnv$submit.but, row = 5, column = 1, pady = c(10,0))
+	##7th row
+	tkgrid(ObjectEnv$submit.but, row = 6, column = 1, pady = c(10,0))
 	
 	tkgrid.columnconfigure(ObjectEnv$tt, 0, weight = 1)
 	tkgrid.columnconfigure(ObjectEnv$tt, 1, weight = 1)
@@ -65,12 +63,58 @@ WorkflowGUI <- function(){
 	ObjectEnv$topMenu <- tkmenu(ObjectEnv$tt) # Create a menu
 	tkconfigure(ObjectEnv$tt, menu = ObjectEnv$topMenu) # Add it to the 'ObjectEnv$tt' window
 	
-	##FILE MENU:
+	##MENU TABS:
+	ObjectEnv$projectMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
 	ObjectEnv$fileMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
+	ObjectEnv$optionsMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
 	
 	##TAB 1
-	filelistMenu <- tkmenu(ObjectEnv$fileMenu, tearoff = FALSE)
-	tkadd(filelistMenu, "command", label = "New...", command = function() {
+	##NEW PROJECT
+	# tkadd(ObjectEnv$projectMenu, "command", label = "New project", command = function() {
+		
+		# yesnocancel <- tkmessageBox(icon = "warning" , message = "Do you want to save the changes to the current project?", title = "Warning", type = "yesnocancel")
+		
+		# if(tclvalue(yesnocancel) == "yes"){
+			# saveCurrentProject()
+		# }
+		
+		# if(tclvalue(yesnocancel) != "cancel"){
+			# createNewProjectGUI()
+		# }
+	# })
+	
+	##OPEN PROJECT
+	tkadd(ObjectEnv$projectMenu, "command", label = "Open Project Manager", command = function() {
+	
+		yesnocancel <- tkmessageBox(icon = "warning" , message = "Do you want to save the changes to the current project?", title = "Warning", type = "yesnocancel")
+		
+		if(tclvalue(yesnocancel) == "yes"){
+			saveCurrentProject()
+		}
+		
+		if(tclvalue(yesnocancel) != "cancel"){
+			startGUI()
+			tkdestroy(ObjectEnv$tt)
+		}
+		
+	})
+	
+	##SAVE CURRENT PROJECT
+	tkadd(ObjectEnv$projectMenu, "command", label = "Save", command = function() {
+		saveCurrentProject()
+	})
+	
+	
+	
+	##SAVE PROJECT AS
+	tkadd(ObjectEnv$projectMenu, "command", label = "Save Project", command = function() {
+		saveCurrentProject()
+	})
+	
+	
+	##TAB 2
+	ObjectEnv$filelistMenu <- tkmenu(ObjectEnv$fileMenu, tearoff = FALSE)
+	tkadd(ObjectEnv$filelistMenu, "command", label = "New...", command = function() {
 		filename <- tk_choose.files(multi = FALSE, filters = NULL, index = 1)
 		filemat <- as.matrix(read.csv(filename))
 		WorkflowEnv$cpdID <- vector()
@@ -85,7 +129,7 @@ WorkflowGUI <- function(){
 		}
 	})
 	
-	tkadd(filelistMenu, "command", label = "Append to current files", command = function() {
+	tkadd(ObjectEnv$filelistMenu, "command", label = "Append to current files", command = function() {
 		filename <- tk_choose.files(multi = FALSE, filters = NULL, index = 1)
 		filemat <- as.matrix(read.csv(filename))
 		lfiles <- length(WorkflowEnv$guifiles)
@@ -97,17 +141,13 @@ WorkflowGUI <- function(){
 		}
 	})
 	
-	tkadd(ObjectEnv$fileMenu, "cascade", label = "Import file table...", menu = filelistMenu)
+	tkadd(ObjectEnv$fileMenu, "cascade", label = "Import file table...", menu = ObjectEnv$filelistMenu)
 	tkadd(ObjectEnv$fileMenu, "separator")
 	tkadd(ObjectEnv$fileMenu, "command", label = "Quit", command = function() tkdestroy(ObjectEnv$tt))
 	
 	
-	##TAB 2
-	ObjectEnv$optionsMenu <- tkmenu(ObjectEnv$fileMenu, tearoff = FALSE)
-	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit RMassBank settings", command=function(){
-		SettingsGUI(ObjectEnv$tt)
-	})
-	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit record annotations", command=function(){
+	##TAB 3
+	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit Project settings", command=function(){
 		##Add later
 	})
 	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit xcms parameters", command=function(){
@@ -116,22 +156,22 @@ WorkflowGUI <- function(){
 	
 	##SUBTAB 1 (deprofile)
 	ObjectEnv$deprofileMenu <- tkmenu(ObjectEnv$fileMenu, tearoff = FALSE)
-	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "None", value = "NA", variable=ObjectEnv$dummyradio, command=function(){
+	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "None", value = "NA", variable=WorkflowEnv$dummyradio, command=function(){
 		o <- getOption("RMassBank")
 		o$deprofile <- NA
 		options("RMassBank" = o)
 	})
-	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "spline", value = "deprofile.spline", variable=ObjectEnv$dummyradio, command=function(){
+	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "spline", value = "deprofile.spline", variable=WorkflowEnv$dummyradio, command=function(){
 		o <- getOption("RMassBank")
 		o$deprofile <- "deprofile.spline"
 		options("RMassBank" = o)
 	})
-	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "fwhm", value = "deprofile.fwhm", variable=ObjectEnv$dummyradio, command=function(){
+	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "fwhm", value = "deprofile.fwhm", variable=WorkflowEnv$dummyradio, command=function(){
 		o <- getOption("RMassBank")
 		o$deprofile <- "deprofile.fwhm"
 		options("RMassBank" = o)
 	})
-	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "localMax", value = "deprofile.localMax", variable=ObjectEnv$dummyradio, command=function(){
+	tkadd(ObjectEnv$deprofileMenu, "radiobutton", label = "localMax", value = "deprofile.localMax", variable=WorkflowEnv$dummyradio, command=function(){
 		o <- getOption("RMassBank")
 		o$deprofile <- "deprofile.localMax"
 		options("RMassBank" = o)
@@ -145,6 +185,7 @@ WorkflowGUI <- function(){
 		SLGUI(ObjectEnv$tt)
 	})
 	
-	tkadd(ObjectEnv$topMenu, "cascade", label = "File", menu = ObjectEnv$fileMenu)
+	tkadd(ObjectEnv$topMenu, "cascade", label = "File", menu = ObjectEnv$projectMenu)
+	tkadd(ObjectEnv$topMenu, "cascade", label = "Edit", menu = ObjectEnv$fileMenu)
 	tkadd(ObjectEnv$topMenu, "cascade", label = "Settings", menu = ObjectEnv$optionsMenu)
 }

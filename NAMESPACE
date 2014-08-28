@@ -1,3 +1,3 @@
-export(WorkflowGUI)
+export(startRMBGUI)
 import(tcltk)
 importFrom(RMassBank, RmbDefaultSettings)
