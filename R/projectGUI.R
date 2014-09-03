@@ -1,5 +1,6 @@
 currentProjectEnv <- new.env()
 currentProjectEnv$currentProject <- NA
+currentProjectEnv$fileDir <- NA
 currentProjectEnv$annotations <- list()
 projectNames <- list()
 
@@ -191,6 +192,9 @@ createNewProjectGUI <- function(){
 	tkgrid(lc_solvent_a.label, lc_solvent_a.entry, sticky="ew")
 	tkgrid(lc_solvent_b.label, lc_solvent_b.entry, sticky="ew")
 	tkgrid(lc_column.label, lc_column.entry, sticky="ew")
+	
+	SEP <- ttkseparator(parent=newProj, orient="horizontal")
+	tkgrid(SEP, columnspan=2, pady=c(5,5), sticky = "ew")
 	tkgrid(import.but,submit.but)
 	
 	tkgrid.configure(name.label, sticky="e")
@@ -233,7 +237,7 @@ readCurrentProject <- function(){
 			csv1 <- file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,filesInProject[csvs[1]])
 			FILE1 <- as.matrix(read.csv(csv1))
 			if("SMILES" %in% colnames(FILE1)){
-				tclvalue(WorkflowEnv$compoundList) <- filesInProject[csvs[1]]
+				tclvalue(WorkflowEnv$compoundList) <- file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,filesInProject[csvs[1]])
 			} else {
 				for(i in 1:nrow(FILE1)){
 					tkinsert(ObjectEnv$lboxfiles, "end", FILE1[i,"Files"])
@@ -276,9 +280,9 @@ saveCurrentProject <- function(){
 		
 		##Save files and cpdIDs in filetable
 		if(length(WorkflowEnv$guifiles) > 0){
-			m <- matrix(c(WorkflowEnv$guifiles,WorkflowEnv$cpdID),length(WorkflowEnv$guifiles),2,
+			m <- matrix(c(sapply(WorkflowEnv$guifiles,normalizePath),WorkflowEnv$cpdID),length(WorkflowEnv$guifiles),2,
 				dimnames=list(rep("",length(WorkflowEnv$guifiles)),c("Files","ID")))
-			write.csv(m, file=file.path(currentProjectDir, "ftable.csv", row.names = FALSE))
+			write.csv(m, file=file.path(currentProjectDir, "ftable.csv"), row.names = FALSE)
 		}
 		
 		##Save settings
@@ -287,6 +291,8 @@ saveCurrentProject <- function(){
 		close(fileConn)
 		
 		if(tclvalue(WorkflowEnv$compoundList) != ""){
-			file.copy(from=tclvalue(WorkflowEnv$compoundList), to=currentProjectDir, overwrite = TRUE)
+			if(dirname(tclvalue(WorkflowEnv$compoundList)) != currentProjectDir){
+				file.copy(from=tclvalue(WorkflowEnv$compoundList), to=currentProjectDir, overwrite = TRUE)
+			}
 		}
 }

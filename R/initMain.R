@@ -209,6 +209,7 @@ initButtons <- function(){
 		if(tclvalue(WorkflowEnv$compoundList)!=""){
 			o <- getOption("RMassBank")
 			if(!is.null(o$xcms)){
+				saveCurrentProject()
 				w <- newMsmsWorkspace()
 				loadList(tclvalue(WorkflowEnv$compoundList))
 				oo <- o$xcms

@@ -25,26 +25,18 @@ WorkflowGUI <- function(){
 	tkgrid(ObjectEnv$xbar, column = 1, columnspan = 3, pady = c(0,10), padx = 0, sticky="new")
 	
 	##3rd row
-	tkgrid(ObjectEnv$settings.label, pady = 5)
-	tkgrid(ObjectEnv$settings.entry, row = 2, column = 1, columnspan = 3, pady = 5)
-	tkgrid(ObjectEnv$chooseSettings.but, column = 5, row = 2, padx = 5, sticky = "w")
-	##CONF
-	tkgrid.configure(ObjectEnv$settings.entry, sticky = "new")
-	tkgrid.configure(ObjectEnv$settings.label, sticky="e")
-	
-	##4th row
 	tkgrid(ObjectEnv$compoundlist.label, pady = 5)
-	tkgrid(ObjectEnv$compoundList.entry, row = 3, column = 1, columnspan = 3, pady = 5)
-	tkgrid(ObjectEnv$choosecompoundList.but, column = 5, row = 3, padx = 5, sticky = "w")
+	tkgrid(ObjectEnv$compoundList.entry, row = 2, column = 1, columnspan = 3, pady = 5)
+	tkgrid(ObjectEnv$choosecompoundList.but, column = 5, row = 2, padx = 5, sticky = "w")
 	##CONF
 	tkgrid.configure(ObjectEnv$compoundList.entry, sticky = "new")
 	tkgrid.configure(ObjectEnv$compoundlist.label, sticky="e")
 	
-	##5th row
+	##4th row
 	tkgrid(tklabel(ObjectEnv$tt, text = "Method of reading the \n files"), ObjectEnv$cBoxmethod, tklabel(ObjectEnv$tt, text = "Ionization mass:"), ObjectEnv$cBoxmode)
 	
-	##7th row
-	tkgrid(ObjectEnv$submit.but, row = 6, column = 1, pady = c(10,0))
+	##5th row
+	tkgrid(ObjectEnv$submit.but, row = 4, column = 1, pady = c(10,0))
 	
 	tkgrid.columnconfigure(ObjectEnv$tt, 0, weight = 1)
 	tkgrid.columnconfigure(ObjectEnv$tt, 1, weight = 1)
@@ -178,14 +170,17 @@ WorkflowGUI <- function(){
 	})
 	
 	tkadd(ObjectEnv$optionsMenu, "cascade", label = "Deprofiling options", menu=ObjectEnv$deprofileMenu)
-	tkadd(ObjectEnv$optionsMenu, "command", label = "RT Shift/Margin", command=function(){
-		RTGUI(ObjectEnv$tt)
-	})
 	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit spectra list", command=function(){
 		SLGUI(ObjectEnv$tt)
 	})
+	tkadd(ObjectEnv$optionsMenu, "command", label = "RT Shift/Margin", command=function(){
+		RTGUI(ObjectEnv$tt)
+	})
+
 	
 	tkadd(ObjectEnv$topMenu, "cascade", label = "File", menu = ObjectEnv$projectMenu)
 	tkadd(ObjectEnv$topMenu, "cascade", label = "Edit", menu = ObjectEnv$fileMenu)
 	tkadd(ObjectEnv$topMenu, "cascade", label = "Settings", menu = ObjectEnv$optionsMenu)
+	Sys.sleep(0.1)
+	.Tcl(paste("wm resizable", .Tk.ID(ObjectEnv$tt), 0, 0))
 }

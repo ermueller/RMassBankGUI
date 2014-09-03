@@ -1,4 +1,4 @@
-startRMBGUI <- function(libname, pkgname) {
+startRMBGUI <- function() {
 	initWorkflowEnv()	##Variables for main Window
 	initXCMSEnv()
 	startGUI()

@@ -2,23 +2,22 @@ startEnv <- new.env()
 		
 startGUI <- function(){
 
-		##READ CONFIGFILE TO GET PROJECT DIRECTORY
-		
-		configfile <- system.file(file = "config/config.txt",package="RMassBankGUI")
-		fileConn <- file(configfile)
-		projectDir <- readLines(fileConn)
-
-		if(length(currentProjectEnv$fileDir) > 0){
-			currentProjectEnv$fileDir <- projectDir
-			close(fileConn)
-		} else {
-			currentProjectEnv$fileDir <- NA
-			tkmessageBox(message = "Welcome to RMassBankGUI!\n Please choose a folder that you want to use to save your projects.")
-			while(is.na(currentProjectEnv$fileDir)){
-				currentProjectEnv$fileDir <- tk_choose.dir()
+		##Starting prompt: Check if a filedir is currently used.
+		if(is.na(currentProjectEnv$fileDir)){
+			configfile <- system.file(file = "config/config.txt",package="RMassBankGUI")
+			fileConn <- file(configfile)
+			projectDir <- readLines(fileConn)
+			if(length(projectDir) > 0){
+				currentProjectEnv$fileDir <- projectDir
+				close(fileConn)
+			} else {
+				tkmessageBox(message = "Welcome to RMassBankGUI!\n Please choose a folder that you want to use to save your projects.")
+				while(is.na(currentProjectEnv$fileDir)){
+					currentProjectEnv$fileDir <- tk_choose.dir()
+				}
+				#writeLines(currentProjectEnv$fileDir,fileConn)
+				close(fileConn)
 			}
-			#writeLines(currentProjectEnv$fileDir,fileConn)
-			close(fileConn)
 		}
 		
 		##NAMES OF ALREADY EXISTANT PROJECTS
