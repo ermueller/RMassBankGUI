@@ -5,38 +5,40 @@ WorkflowGUI <- function(){
 	updateXCMSoptions()
 	
 	##IMAGE
-	#fpath <- system.file("cosmetics/RMassBank_logo.gif", package="RMassBankGUI")
-	#iconName <- "::tcl::logo"
-	#i1 <- tkimage.create("photo", iconName, file=fpath)
-	#a <- ttklabel(ObjectEnv$tt,image=iconName)
+	fpath <- system.file("cosmetics/RMassBank_logo.gif", package="RMassBankGUI")
+	iconName <- "::tcl::logo"
+	i1 <- tkimage.create("photo", iconName, file=fpath)
+	a <- ttklabel(ObjectEnv$tt,image=iconName)
 	
 	##1st row
+	tkgrid(a, column = 1, sticky = "w")
+	
+	##2nd row
 	tkgrid(ObjectEnv$files.label, ObjectEnv$lboxfiles,  pady = c(10,0))
-	tkgrid(ObjectEnv$lboxcpdID, pady = c(10,0), row = 0, column = 3, sticky = "sew")
-	tkgrid(ObjectEnv$ybar, pady = c(10,0), row = 0, column = 4, sticky = "w", padx = c(0,10))
-	tkgrid(ObjectEnv$choosefiles.but, row = 0, column = 5, padx = 5, pady = c(10,0), sticky = "w")
-	#tkgrid(a, row = 0, column = 5)
+	tkgrid(ObjectEnv$lboxcpdID, pady = c(10,0), row = 1, column = 3, sticky = "sew")
+	tkgrid(ObjectEnv$ybar, pady = c(10,0), row = 1, column = 4, sticky = "w", padx = c(0,10))
+	tkgrid(ObjectEnv$choosefiles.but, row = 1, column = 5, padx = 5, pady = c(10,0), sticky = "w")
 	tkgrid.configure(ObjectEnv$files.label, sticky = "e")
 	tkgrid.configure(ObjectEnv$lboxfiles, columnspan = 2, sticky = "sew", padx = c(0,0))
 	#tkgrid.configure(ybar, sticky = "w", padx = c(0,10))
 	
 	
-	##2nd row
+	##3rd row
 	tkgrid(ObjectEnv$xbar, column = 1, columnspan = 3, pady = c(0,10), padx = 0, sticky="new")
 	
-	##3rd row
+	##4th row
 	tkgrid(ObjectEnv$compoundlist.label, pady = 5)
-	tkgrid(ObjectEnv$compoundList.entry, row = 2, column = 1, columnspan = 3, pady = 5)
-	tkgrid(ObjectEnv$choosecompoundList.but, column = 5, row = 2, padx = 5, sticky = "w")
+	tkgrid(ObjectEnv$compoundList.entry, row = 3, column = 1, columnspan = 3, pady = 5)
+	tkgrid(ObjectEnv$choosecompoundList.but, column = 5, row = 3, padx = 5, sticky = "w")
 	##CONF
 	tkgrid.configure(ObjectEnv$compoundList.entry, sticky = "new")
 	tkgrid.configure(ObjectEnv$compoundlist.label, sticky="e")
 	
-	##4th row
+	##5th row
 	tkgrid(tklabel(ObjectEnv$tt, text = "Method of reading the \n files"), ObjectEnv$cBoxmethod, tklabel(ObjectEnv$tt, text = "Ionization mass:"), ObjectEnv$cBoxmode)
 	
-	##5th row
-	tkgrid(ObjectEnv$submit.but, row = 4, column = 1, pady = c(10,0))
+	##6th row
+	tkgrid(ObjectEnv$submit.but, row = 5, column = 1, pady = c(10,0))
 	
 	tkgrid.columnconfigure(ObjectEnv$tt, 0, weight = 1)
 	tkgrid.columnconfigure(ObjectEnv$tt, 1, weight = 1)
@@ -96,12 +98,12 @@ WorkflowGUI <- function(){
 		saveCurrentProject()
 	})
 	
-	
-	
-	##SAVE PROJECT AS
-	tkadd(ObjectEnv$projectMenu, "command", label = "Save Project", command = function() {
+	tkadd(ObjectEnv$projectMenu, "separator")
+	tkadd(ObjectEnv$projectMenu, "command", label = "Save and Close", command = function() {
 		saveCurrentProject()
+		tkdestroy(ObjectEnv$tt)
 	})
+	
 	
 	
 	##TAB 2
@@ -139,9 +141,9 @@ WorkflowGUI <- function(){
 	
 	
 	##TAB 3
-	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit Project settings", command=function(){
+	#tkadd(ObjectEnv$optionsMenu, "command", label = "Edit Project settings", command=function(){
 		##Add later
-	})
+	#})
 	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit xcms parameters", command=function(){
 		xcmsGUI()
 	})

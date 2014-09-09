@@ -12,8 +12,10 @@ startGUI <- function(){
 				close(fileConn)
 			} else {
 				tkmessageBox(message = "Welcome to RMassBankGUI!\n Please choose a folder that you want to use to save your projects.")
-				while(is.na(currentProjectEnv$fileDir)){
-					currentProjectEnv$fileDir <- tk_choose.dir()
+				currentProjectEnv$fileDir <- tk_choose.dir()
+				if(is.na(currentProjectEnv$fileDir)){
+					close(fileConn)
+					return(0)
 				}
 				#writeLines(currentProjectEnv$fileDir,fileConn)
 				close(fileConn)
@@ -55,7 +57,7 @@ startGUI <- function(){
 				readCurrentProject()
 				tkdestroy(startEnv$startWindow)
 			} else {
-				tkmessagebox(message = "No Project is currently selected")
+				tkmessageBox(message = "No project is currently selected")
 			}
 			
 		})

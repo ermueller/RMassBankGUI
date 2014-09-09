@@ -1,6 +1,13 @@
 importRmbSettings <- function(fpath){
-	loadRmbSettings(fpath)
-	oo <- getOption("RMassBank")
+	
+	oo <- yaml.load_file("RMassBankProjects/QEX/settings.ini")
+	if(is.null(oo$deprofile)){
+		oo$deprofile <- NA
+	}
+	if(is.null(o$babeldir)){
+		oo$babeldir <- NA
+	}
+	options("RMassBank" = oo)
 	
 	ox <- oo$xcms
 	tclvalue(XCMSEnv$ppm) <- ox$ppm
@@ -28,6 +35,7 @@ defaultSettings <- function(){
 	
 	##Load these settings
 		oo <- getOption("RMassBank")
+		oo$spectraList <- NULL
 		oo$annotations$authors <- tclvalue(currentProjectEnv$annotations$authors)
 		oo$annotations$license <- tclvalue(currentProjectEnv$annotations$license)
 			

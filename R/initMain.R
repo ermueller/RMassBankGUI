@@ -215,11 +215,6 @@ initButtons <- function(){
 				oo <- o$xcms
 				Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
 						  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
-				print(WorkflowEnv$guifiles)
-				print(WorkflowEnv$cpdID)
-				print(tclvalue(WorkflowEnv$rMethod))
-				print(tclvalue(WorkflowEnv$mzmode))
-				print(Args)
 				w <- msmsRead(w,files = WorkflowEnv$guifiles, cpdids = WorkflowEnv$cpdID, readMethod = tclvalue(WorkflowEnv$rMethod), mode = tclvalue(WorkflowEnv$mzmode), 
 							confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
 							progressbar = "progressBarHook", MSe = FALSE)

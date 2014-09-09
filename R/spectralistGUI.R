@@ -19,19 +19,22 @@ SLGUI <- function(tlwindow){
 	oo <- getOption("RMassBank")
 	SL <- oo$spectraList
 	
+	
 	SLtostring <- function(x){
 		lapply(x, function(y){
 			sapply(y, function(z) return(z))
 			})
 		}
 	
-	SLstring <- SLtostring(SL)
+	if(!is.null(SL)){
+		SLstring <- SLtostring(SL)
 	
-	for(i in 1:length(SLstring)){
-		tkinsert(lboxMode, "end", SLstring[[i]][1])
-		tkinsert(lboxCE, "end", SLstring[[i]][2])
-		tkinsert(lboxCES, "end", SLstring[[i]][3])
-		tkinsert(lboxRES, "end", SLstring[[i]][4])
+		for(i in 1:length(SLstring)){
+			tkinsert(lboxMode, "end", SLstring[[i]][1])
+			tkinsert(lboxCE, "end", SLstring[[i]][2])
+			tkinsert(lboxCES, "end", SLstring[[i]][3])
+			tkinsert(lboxRES, "end", SLstring[[i]][4])
+		}
 	}
 	
 	tkbind(lboxMode, "<Delete>", function(...) {
@@ -46,7 +49,6 @@ SLGUI <- function(tlwindow){
 			sapply(rev(index), function(x){tkdelete(lboxCES,x)})
 			sapply(rev(index), function(x){tkdelete(lboxRES,x)})
 			oo <- getOption("RMassBank")
-			print(index)
 			for(j in rev(index)){
 				SL[[j+1]] <<- NULL
 				oo <- getOption("RMassBank")
@@ -69,7 +71,6 @@ SLGUI <- function(tlwindow){
 				sapply(rev(index), function(x){tkdelete(lboxCES,x)})
 				sapply(rev(index), function(x){tkdelete(lboxRES,x)})
 				oo <- getOption("RMassBank")
-				print(index)
 				for(j in rev(index)){
 					SL[[j+1]] <<- NULL
 					oo <- getOption("RMassBank")
@@ -91,7 +92,6 @@ SLGUI <- function(tlwindow){
 				sapply(rev(index), function(x){tkdelete(lboxCES,x)})
 				sapply(rev(index), function(x){tkdelete(lboxRES,x)})
 				oo <- getOption("RMassBank")
-				print(index)
 				for(j in rev(index)){
 					SL[[j+1]] <<- NULL
 					oo <- getOption("RMassBank")
@@ -113,7 +113,6 @@ SLGUI <- function(tlwindow){
 				sapply(rev(index), function(x){tkdelete(lboxCES,x)})
 				sapply(rev(index), function(x){tkdelete(lboxRES,x)})
 				oo <- getOption("RMassBank")
-				print(index)
 				for(j in rev(index)){
 					SL[[j+1]] <<- NULL
 					oo <- getOption("RMassBank")
@@ -137,9 +136,9 @@ SLGUI <- function(tlwindow){
 		RESOL <- tclVar("")
 	}
 	
-	addbutton <- ttkbutton(parent=tt4, text = "Add new spectrum", command = addSpectrum)
+	addbutton <- ttkbutton(parent=tt4, text = "Add spectrum", command = addSpectrum)
 	
-	savebut <- ttkbutton(tt4, text = "Save and close", command = function(){
+	savebut <- ttkbutton(tt4, text = "Apply", command = function(){
 		tkdestroy(tt4)
 	})
 	
@@ -166,7 +165,7 @@ SLGUI <- function(tlwindow){
 	tkgrid(m, columnspan=4, pady=c(5,5), sticky = "ew")
 	tkgrid(SMODEentry, CEentry, CESentry, RESentry, padx=c(0,0))
 	
-	tkgrid(savebut, row=4, column = 0)
+	tkgrid(savebut, row=4, column = 3, columnspan=2)
 	tkgrid(addbutton, row=4, column = 1, columnspan=2)
 	Sys.sleep(0.1)
 	.Tcl(paste("wm resizable", .Tk.ID(tt4), 0, 0))
