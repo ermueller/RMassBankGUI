@@ -1,7 +1,7 @@
 Package: RMassBankGUI
 Type: Package
 Title: A GUI for high level access for RMassBank
-Version: 0.0.9
+Version: 0.0.10
 Authors@R: person(given = "Erik", family = "Muller", role =
     "aut", email = "erik.mueller@student.uni-halle.de")
 Author: Erik Mueller

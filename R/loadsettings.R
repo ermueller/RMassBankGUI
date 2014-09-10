@@ -1,10 +1,11 @@
 importRmbSettings <- function(fpath){
-	
-	oo <- yaml.load_file("RMassBankProjects/QEX/settings.ini")
+	message("fpath=", fpath)
+	oo <- yaml.load_file(fpath)
+	#oo <- yaml.load_file("RMassBankProjects/QEX/settings.ini")
 	if(is.null(oo$deprofile)){
 		oo$deprofile <- NA
 	}
-	if(is.null(o$babeldir)){
+	if(is.null(oo$babeldir)){
 		oo$babeldir <- NA
 	}
 	options("RMassBank" = oo)

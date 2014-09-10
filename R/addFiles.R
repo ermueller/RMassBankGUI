@@ -37,7 +37,7 @@ addFilesGUI <- function(newfiles){
 	})
 	
 	inferb <- ttkbutton(parent=ObjectEnv$tt6, text="Infer cpdIDs automatically...", command = function(...){
-		inferredIDs <- sapply(newfiles,function(x){
+		inferredIDs <- sapply(basename(newfiles), function(x){
 			strsplit(x,"_")[[1]][2]
 		})
 		for(i in 1:length(newfiles)){
