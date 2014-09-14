@@ -141,9 +141,9 @@ WorkflowGUI <- function(){
 	
 	
 	##TAB 3
-	#tkadd(ObjectEnv$optionsMenu, "command", label = "Edit Project settings", command=function(){
-		##Add later
-	#})
+	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit Project settings", command=function(){
+		editProjectGUI()
+	})
 	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit xcms parameters", command=function(){
 		xcmsGUI()
 	})

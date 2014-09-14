@@ -32,7 +32,7 @@ startGUI <- function(){
 		
 		##LISTBOX WITH SCROLLBAR
 		startEnv$ybar <- ttkscrollbar(startEnv$startWindow, command = function(...)tkyview(startEnv$lboxProjects,...))
-		startEnv$lboxProjects <- tklistbox(startEnv$startWindow, width = 50, borderwidth = 0 , height = 10, selectmode = "single", 
+		startEnv$lboxProjects <- tklistbox(startEnv$startWindow, width = 55, borderwidth = 0 , height = 10, selectmode = "single", 
 						yscrollcommand = function(...) tkset(startEnv$ybar, ...), 
 						background = "white")
 		
@@ -62,13 +62,25 @@ startGUI <- function(){
 			
 		})
 		
+		startEnv$editFolder.but <- ttkbutton(parent=startEnv$startWindow, text="Change folder", command = function(){
+			newdir <- tk_choose.dir()
+			if(!is.na(newdir)){
+				currentProjectEnv$fileDir <- newdir
+				tkdelete(startEnv$lboxProjects,0,length(startEnv$projects)-1)
+				startEnv$projects <- list.files(currentProjectEnv$fileDir)
+				for(i in startEnv$projects){
+					tkinsert(startEnv$lboxProjects,"end",i)
+				}
+			}
+		})
+		
 		SEP <- ttkseparator(parent=startEnv$startWindow, orient="horizontal")
 		
 		##GRID LAYOUT
-		tkgrid(startEnv$lboxProjects, columnspan = 3, sticky="ew")
-		tkgrid(SEP, columnspan=4, pady=c(5,5), sticky = "ew")
-		tkgrid(startEnv$createProject.but, startEnv$chooseProject.but, pady=c(5,0))
-		tkgrid(startEnv$ybar, sticky = "nws", column = 3, row = 0)
+		tkgrid(startEnv$lboxProjects, columnspan = 4, sticky="ew")
+		tkgrid(SEP, columnspan=5, pady=c(5,5), sticky = "ew")
+		tkgrid(startEnv$createProject.but, startEnv$chooseProject.but, startEnv$editFolder.but, pady=c(5,0))
+		tkgrid(startEnv$ybar, sticky = "nws", column = 4, row = 0)
 		
 		##Configuring grid
 		tkgrid.configure(startEnv$lboxProjects, sticky="e")

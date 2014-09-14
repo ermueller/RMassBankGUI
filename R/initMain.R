@@ -223,6 +223,7 @@ initButtons <- function(){
 				w2 <- mbWorkflow(w2, steps=1:2)
 				w2 <- loadInfolist(w2, "infolist.csv")
 				w2 <- mbWorkflow(w2, steps=3:8)
+				tk_messageBox(message = paste("The record data and moldata have been written to", file.path(getwd(),o$annotations$entry_prefix)))
 			}
 		}
 	}
