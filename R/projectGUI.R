@@ -523,6 +523,7 @@ readCurrentProject <- function(){
 	
 	##RESET BEFORE READING THE PROJECT
 	resetMain()
+	resetList()
 	
 	##LIST THE FILES IN PROJECT FOLDER
 	filesInProject <- list.files(file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject))
@@ -533,6 +534,7 @@ readCurrentProject <- function(){
 			FILE1 <- as.matrix(read.csv(csv1))
 			if("SMILES" %in% colnames(FILE1)){
 				tclvalue(WorkflowEnv$compoundList) <- file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,filesInProject[csvs[1]])
+				loadList(tclvalue(WorkflowEnv$compoundList))
 			} else {
 				for(i in 1:nrow(FILE1)){
 					tkinsert(ObjectEnv$lboxfiles, "end", FILE1[i,"Files"])
@@ -547,6 +549,7 @@ readCurrentProject <- function(){
 				FILE2 <- as.matrix(read.csv(csv2))
 				if("SMILES" %in% colnames(FILE2)){
 					tclvalue(WorkflowEnv$compoundList) <- file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,filesInProject[csvs[2]])
+					loadList(tclvalue(WorkflowEnv$compoundList))
 				} else {
 					for(i in 1:nrow(FILE2)){
 						tkinsert(ObjectEnv$lboxfiles, "end", FILE2[i,"Files"])

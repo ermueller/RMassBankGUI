@@ -1,7 +1,7 @@
 Package: RMassBankGUI
 Type: Package
 Title: A GUI for high level access for RMassBank
-Version: 0.0.10
+Version: 0.1.1
 Authors@R: person(given = "Erik", family = "Muller", role =
     "aut", email = "erik.mueller@student.uni-halle.de")
 Author: Erik Mueller
@@ -15,12 +15,15 @@ Suggests:
 Collate:
 	'addFiles.R'
 	'bindDel.R'
+	'debugModule.R'
 	'initMain.R'
 	'initXCMS.R'
 	'projectGUI.R'
 	'loadsettings.R'
 	'rtGUI.R'
+	'showspecGUI.R'
 	'startGUI.R'
+	'stateGUI.R'
 	'spectralistGUI.R'
 	'Synchscroll.R'
 	'WorkflowGUI.R'

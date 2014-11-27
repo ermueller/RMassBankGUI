@@ -52,6 +52,7 @@ startGUI <- function(){
 			number <- tclvalue(tkcurselection(startEnv$lboxProjects))
 			if(number != ""){
 				number <- as.numeric(number) + 1
+				initDebugEnv()
 				currentProjectEnv$currentProject <- startEnv$projects[number]
 				WorkflowGUI()
 				readCurrentProject()

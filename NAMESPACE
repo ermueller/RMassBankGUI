@@ -1,3 +1,4 @@
 export(startRMBGUI)
+export(progressBarRMBGUI)
 import(tcltk)
 importFrom(RMassBank, RmbDefaultSettings)

@@ -3,6 +3,7 @@ WorkflowGUI <- function(){
 	##Dummy variables
 	initMain()
 	updateXCMSoptions()
+	stateGUI(ObjectEnv$tt)
 	
 	##IMAGE
 	fpath <- system.file("cosmetics/RMassBank_logo.gif", package="RMassBankGUI")
@@ -61,6 +62,7 @@ WorkflowGUI <- function(){
 	ObjectEnv$projectMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
 	ObjectEnv$fileMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
 	ObjectEnv$optionsMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
+	ObjectEnv$debugMenu <- tkmenu(ObjectEnv$topMenu, tearoff = FALSE)
 	
 	##TAB 1
 	##NEW PROJECT
@@ -86,7 +88,7 @@ WorkflowGUI <- function(){
 			saveCurrentProject()
 		}
 		
-		if(tclvalue(yesnocancel) != "cancel"){
+		if(tclvalue(yesnocancel) == "no"){
 			startGUI()
 			tkdestroy(ObjectEnv$tt)
 		}
@@ -172,17 +174,26 @@ WorkflowGUI <- function(){
 	})
 	
 	tkadd(ObjectEnv$optionsMenu, "cascade", label = "Deprofiling options", menu=ObjectEnv$deprofileMenu)
+	
 	tkadd(ObjectEnv$optionsMenu, "command", label = "Edit spectra list", command=function(){
 		SLGUI(ObjectEnv$tt)
 	})
 	tkadd(ObjectEnv$optionsMenu, "command", label = "RT Shift/Margin", command=function(){
 		RTGUI(ObjectEnv$tt)
 	})
-
+	
+	##TAB 4
+	tkadd(ObjectEnv$debugMenu, "command", label = "Debug options", command=function(){
+		debugGUI(ObjectEnv$tt)
+	})
+	
+	
 	
 	tkadd(ObjectEnv$topMenu, "cascade", label = "File", menu = ObjectEnv$projectMenu)
 	tkadd(ObjectEnv$topMenu, "cascade", label = "Edit", menu = ObjectEnv$fileMenu)
 	tkadd(ObjectEnv$topMenu, "cascade", label = "Settings", menu = ObjectEnv$optionsMenu)
+	tkadd(ObjectEnv$topMenu, "cascade", label = "Debug", menu = ObjectEnv$debugMenu)
+	
 	Sys.sleep(0.1)
 	.Tcl(paste("wm resizable", .Tk.ID(ObjectEnv$tt), 0, 0))
 }
