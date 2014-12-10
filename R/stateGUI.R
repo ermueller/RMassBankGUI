@@ -13,6 +13,10 @@ tkGreenRect <- function(canvas){
 	tkcreateRect(canvas, 0, 0, 80, 20, "000", "0F3")
 }
 
+tkBlueRect <- function(canvas){
+	tkcreateRect(canvas, 0, 0, 80, 20, "000", "00F")
+}
+
 tkRedRect <- function(canvas){
 	tkcreateRect(canvas, 0, 0, 80, 20, "000", "F00")
 }
@@ -36,12 +40,12 @@ stateGUI <- function(tlwindow) {
 	##Create labels
 	stepLabels <- lapply(1:8, function(i) ttklabel(stateEnv$stateWindow, text=paste("Step",i)))
 	
-	for(i in 1:8) tkgrid(stepLabels[[i]], stateEnv$canvasList[[i]], padx=c(0,0))
+	for(i in 1:8) tkgrid(stepLabels[[i]], stateEnv$canvasList[[i]], padx=c(0,0), pady=c(3,3))
 	
 	a.but <- ttkbutton(stateEnv$stateWindow, text = "Show spectra", command = showspecGUI, width=15)
 	
-	tkgrid(a.but,row=0,column=3)
-	
+	tkgrid(a.but,row=0,column=3,pady=c(3,3))
+
 	.Tcl(paste("wm resizable", .Tk.ID(stateEnv$stateWindow), 0, 0))
 }
 
@@ -90,19 +94,19 @@ tkWorkSpaceCheck <- function(wSpace){
 
 progressBarRMBGUI <- function(object = NULL, value = 0, min = 0, max = 100, close = FALSE)
 {		
-		if(is.null(object))
-		{
-			object <- splitnum(80,max)
-		} else {
-			if(value != 0){
-				if(WorkflowEnv$currentStep != 7){
-					tkcreateRect(stateEnv$canvasList[[WorkflowEnv$currentStep]],  object[value], 0, object[value+1], 20, "000", "0F3")
-				} else{
-					tkcreateRect(stateEnv$canvasList[[WorkflowEnv$currentStep]],  object[value], 0, object[value+1], 20, "0F3", "0F3")
-				}
-				#.Tcl(paste("tkwait visibility",.Tk.ID(stateEnv$stateWindow)))
+	if(is.null(object))
+	{
+		object <- splitnum(80,max)
+	} else {
+		if(value != 0){
+			if(WorkflowEnv$currentStep != 7){
+				tkcreateRect(stateEnv$canvasList[[WorkflowEnv$currentStep]],  object[value], 0, object[value+1], 20, "000", "0F3")
+			} else{
+				tkcreateRect(stateEnv$canvasList[[WorkflowEnv$currentStep]],  object[value], 0, object[value+1], 20, "0F3", "0F3")
 			}
-		}	
+			#.Tcl(paste("tkwait visibility",.Tk.ID(stateEnv$stateWindow)))
+		}
+	}	
 	return(object)
 }
 

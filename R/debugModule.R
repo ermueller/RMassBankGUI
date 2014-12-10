@@ -34,10 +34,11 @@ debugGUI <- function(tlwindow){
 		yesno <- tkmessageBox(icon = "warning" , message = "Do you want to read the changed Workspace? This will overwrite the internal workspace and can have unforeseen effects!", title = "Warning", type = "yesno")
 		
 		if(tclvalue(yesnocancel) == "yes"){
-			
+			eval(parse(text=paste0("WorkflowEnv$wSpace <- ",".GlobalEnv$",tclvalue(debugEnv$oldVar))))
 		}
 		
 	})
 	tkgrid(debugEnv$varLabel, debugEnv$varEntry)
 	tkgrid(debugEnv$buttonLabel, debugEnv$debugButton)
+	tkgrid(debugEnv$readButton)
 }

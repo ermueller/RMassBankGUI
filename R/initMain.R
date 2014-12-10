@@ -27,6 +27,10 @@ resetMain <- function(){
 	tclvalue(WorkflowEnv$settings) <- ""
 	tclvalue(WorkflowEnv$compoundList) <- ""
 	WorkflowEnv$currentStep <- 1
+	WorkflowEnv$stepsDone <- 0
+	tclvalue(WorkflowEnv$stepStart) <- "1"
+	tclvalue(WorkflowEnv$stepEnd) <- "8"
+	resetWorkspace()
 	
 	##Listboxes
 	.Tcl(paste(.Tk.ID(ObjectEnv$lboxfiles), "delete 0 end"))
@@ -74,6 +78,9 @@ initWorkflowEnv <- function(){
 	WorkflowEnv$compoundList <- tclVar("")
 	WorkflowEnv$dummyradio <- tclVar("NA")
 	WorkflowEnv$currentStep <- 0
+	WorkflowEnv$stepStart <- tclVar("1")
+	WorkflowEnv$stepEnd <- tclVar("8")
+	WorkflowEnv$stepsDone <- 0
 }
 
 initXCMSEnv <- function(){
@@ -131,7 +138,9 @@ initListBoxes <- function(){
 initCboxes <- function(){
 	##Comboboxes for main GUI
 	ObjectEnv$cBoxmethod <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$rMethod, values = c("mzR", "xcms", "peaklist"))
-	ObjectEnv$cBoxmode <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$mzmode, values = c("pH", "mH"))
+	ObjectEnv$cBoxmode   <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$mzmode, values = c("pH", "mH"))
+	ObjectEnv$cBoxSteps1 <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$stepStart, values = 1:8, width=2)
+	ObjectEnv$cBoxSteps2 <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$stepEnd, values = 1:8, width=2)
 	#ObjectEnv$cBoxsteps <- ttkcombobox(ObjectEnv$tt, state = "readonly", textvariable = WorkflowEnv$steps, values = 1:8
 }
 
@@ -210,52 +219,73 @@ initButtons <- function(){
 	}
 	
 	submit <- function(){
-		updateXCMSoptions()
-		if(tclvalue(WorkflowEnv$compoundList)!=""){
-			o <- getOption("RMassBank")
-			if(!is.null(o$xcms)){
-				saveCurrentProject()
-				loadList(tclvalue(WorkflowEnv$compoundList))
-				oo <- o$xcms
-				Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
-						  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
-				
-				
-				WorkflowEnv$wSpace <- msmsRead(WorkflowEnv$wSpace,files = WorkflowEnv$guifiles, cpdids = WorkflowEnv$cpdID, readMethod = tclvalue(WorkflowEnv$rMethod), mode = tclvalue(WorkflowEnv$mzmode), 
-							confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
-							progressbar = "progressBarRMBGUI", MSe = FALSE)
-				
-				debugon <- as.logical(as.numeric(tclvalue(debugEnv$on)))
-				
-				
-				for(i in 2:8){
-					if(debugon)
-					eval(parse(text=paste0(".GlobalEnv$",tclvalue(debugEnv$workflowVar), " <- WorkflowEnv$wSpace")))
-					WorkflowEnv$currentStep <- i
-					WorkflowEnv$wSpace <- msmsWorkflow(WorkflowEnv$wSpace, steps=i, mode = tclvalue(WorkflowEnv$mzmode), progressbar = "progressBarRMBGUI", archivename = "archiveRMB")
-					if(i %in% c(3,4,6,8)){
-						tkGreenRect(stateEnv$canvasList[[i]])
-						Sys.sleep(3)
+		if(tclvalue(WorkflowEnv$stepStart) <= (WorkflowEnv$stepsDone + 1)){
+			if(tclvalue(WorkflowEnv$stepStart) <= tclvalue(WorkflowEnv$stepEnd)){
+			updateXCMSoptions()
+				if(tclvalue(WorkflowEnv$compoundList) != ""){
+					o <- getOption("RMassBank")
+					if(!is.null(o$xcms)){
+						WorkflowEnv$currentStep <- as.numeric(tclvalue(WorkflowEnv$stepStart)) + 1
+						saveCurrentProject()
+						loadList(tclvalue(WorkflowEnv$compoundList))
+						oo <- o$xcms
+						Args <- list(method = oo$method, ppm = oo$ppm, snthresh = oo$snthresh,
+								  peakwidth = oo$peakwidth, integrate = oo$integrate, mzdiff = oo$mzdiff, mzCenterFun = oo$mzCenterFun)
+						
+						if(tclvalue(WorkflowEnv$stepStart) == "1"){
+							WorkflowEnv$currentStep <- 1
+							WorkflowEnv$wSpace <- msmsRead(WorkflowEnv$wSpace,files = WorkflowEnv$guifiles, cpdids = WorkflowEnv$cpdID, readMethod = tclvalue(WorkflowEnv$rMethod), mode = tclvalue(WorkflowEnv$mzmode), 
+									confirmMode = FALSE, useRtLimit = TRUE, Args = Args, settings = getOption("RMassBank"), 
+									progressbar = "progressBarRMBGUI", MSe = FALSE)
+							WorkflowEnv$stepsDone <- 1
+						}
+						debugon <- as.logical(as.numeric(tclvalue(debugEnv$on)))
+						
+						if(tclvalue(WorkflowEnv$stepStart) >= "1"){
+							for(i in tclvalue(WorkflowEnv$stepStart):tclvalue(WorkflowEnv$stepEnd)){
+								if(i==1)
+								{next}
+								if(debugon){
+								eval(parse(text=paste0(".GlobalEnv$",tclvalue(debugEnv$workflowVar), " <- WorkflowEnv$wSpace")))}
+								WorkflowEnv$currentStep <- i
+								WorkflowEnv$wSpace <- msmsWorkflow(WorkflowEnv$wSpace, steps=i, mode = tclvalue(WorkflowEnv$mzmode), progressbar = "progressBarRMBGUI", archivename = "archiveRMB")
+								if(i %in% c(3,4,6,8)){
+									tkGreenRect(stateEnv$canvasList[[i]])
+									Sys.sleep(3)
+								}
+								WorkflowEnv$stepsDone <- i
+							}
+						}
+						
+						
+						
+						if(debugon)
+						eval(parse(text=paste0(".GlobalEnv$",tclvalue(debugEnv$workflowVar), " <- WorkflowEnv$wSpace")))
+						
+						if(tclvalue(WorkflowEnv$stepEnd) == 8){
+							yesno <- tk_messageBox(message = paste('The failpeaks have been saved under', paste0(getwd(),"/archiveRMB_Failpeaks.csv"), '\n Please check (and correct, if neccessary) the Failpeaks, then  press "Yes" or "No" to add or leave them out respectively'), type="yesno")
+							
+							w2 <- newMbWorkspace(WorkflowEnv$wSpace)
+							if(yesno == "yes"){
+								w2 <- addPeaks(w2, "archiveRMB_Failpeaks.csv")
+							}
+							w2 <- mbWorkflow(w2, steps=1:2)
+							tk_messageBox(message = paste('The infolist has been saved under', paste0(getwd(),"/infolist.csv"), '\n Please check (and correct, if neccessary) the infolist and press "OK" when finished'))
+							w2 <- loadInfolist(w2, "infolist.csv")
+							w2 <- mbWorkflow(w2, steps=3:8)
+							tk_messageBox(message = paste("The record data and moldata have been written to", file.path(getwd(),o$annotations$entry_prefix)))
+						}
+					} else{
+						tkmessageBox(message="The XCMS parameters haven't been defined", icon="alert")
 					}
+				} else{
+					tkmessageBox(message="No compound list has been selected", icon="alert")
 				}
-				
-				
-				
-				if(debugon)
-				eval(parse(text=paste0(".GlobalEnv$",tclvalue(debugEnv$workflowVar), " <- WorkflowEnv$wSpace")))
-				
-				yesno <- tk_messageBox(message = paste('The failpeaks have been saved under', paste0(getwd(),"/archiveRMB_Failpeaks.csv"), '\n Please check (and correct, if neccessary) the Failpeaks, then  press "Yes" or "No" to add or leave them out respectively'), type="yesno")
-				
-				w2 <- newMbWorkspace(WorkflowEnv$wSpace)
-				if(yesno == "yes"){
-					w2 <- addPeaks(w2, "archiveRMB_Failpeaks.csv")
-				}
-				w2 <- mbWorkflow(w2, steps=1:2)
-				tk_messageBox(message = paste('The infolist has been saved under', paste0(getwd(),"/infolist.csv"), '\n Please check (and correct, if neccessary) the infolist and press "OK" when finished'))
-				w2 <- loadInfolist(w2, "infolist.csv")
-				w2 <- mbWorkflow(w2, steps=3:8)
-				tk_messageBox(message = paste("The record data and moldata have been written to", file.path(getwd(),o$annotations$entry_prefix)))
+			}  else{
+				tkmessageBox(message="The starting step number of the workflow can't be greater than the ending step number", icon="alert")
 			}
+		} else{
+			tkmessageBox(message=paste("Step", WorkflowEnv$stepsDone, "has not been done yet, so step", tclvalue(WorkflowEnv$stepStart), "can not properly be executed"), icon="alert")
 		}
 	}
 	

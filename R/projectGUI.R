@@ -568,6 +568,29 @@ readCurrentProject <- function(){
 		} else {
 			tkmessageBox(message="Missing settings-file in project folder. Either use RMassBankGUI to create it or put it manually into the folder", icon="warning")
 		}
+		
+		savedwspace <- grep("workspace", filesInProject)
+		if(length(savedwspace) == 1){
+			load(file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,filesInProject[savedwspace]))
+			WorkflowEnv$wSpace <- WORKSPACE
+			num <- 0
+			for(slo in c("specs","analyzedSpecs","aggregatedSpecs", "recalibratedSpecs", 
+						"analyzedRcSpecs", "aggregatedRcSpecs", "reanalyzedRcSpecs", "refilteredRcSpecs")){
+				if(length(slot(WorkflowEnv$wSpace,slo)) == 0){
+					break
+				} else{
+					num <- num + 1
+				}
+			}
+			
+			WorkflowEnv$stepsDone <- num
+			
+			if(WorkflowEnv$stepsDone > 0){
+				for(i in 1:WorkflowEnv$stepsDone){
+					tkBlueRect(stateEnv$canvasList[[i]])
+				}
+			}
+		}
 	}
 }
 
@@ -593,4 +616,9 @@ saveCurrentProject <- function(){
 				file.copy(from=tclvalue(WorkflowEnv$compoundList), to=currentProjectDir, overwrite = TRUE)
 			}
 		}
+		
+		WORKSPACE <- WorkflowEnv$wSpace
+		
+		save(WORKSPACE, file=file.path(currentProjectEnv$fileDir,currentProjectEnv$currentProject,"workspace"))
+		
 }

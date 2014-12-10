@@ -39,7 +39,10 @@ WorkflowGUI <- function(){
 	tkgrid(tklabel(ObjectEnv$tt, text = "Method of reading the \n files"), ObjectEnv$cBoxmethod, tklabel(ObjectEnv$tt, text = "Ionization mass:"), ObjectEnv$cBoxmode)
 	
 	##6th row
-	tkgrid(ObjectEnv$submit.but, row = 5, column = 1, pady = c(10,0))
+	tkgrid(tklabel(ObjectEnv$tt, text = "From step"), ObjectEnv$cBoxSteps1, tklabel(ObjectEnv$tt, text = "to step"), ObjectEnv$cBoxSteps2, row = 5, pady = 5)
+
+	##7th row
+	tkgrid(ObjectEnv$submit.but, row = 6, column = 1, pady = c(10,0))
 	
 	tkgrid.columnconfigure(ObjectEnv$tt, 0, weight = 1)
 	tkgrid.columnconfigure(ObjectEnv$tt, 1, weight = 1)
@@ -53,6 +56,7 @@ WorkflowGUI <- function(){
 	tkgrid.rowconfigure(ObjectEnv$tt, 3, weight = 1)
 	tkgrid.rowconfigure(ObjectEnv$tt, 4, weight = 1)
 	tkgrid.rowconfigure(ObjectEnv$tt, 5, weight = 1)
+	tkgrid.rowconfigure(ObjectEnv$tt, 6, weight = 1)
 	
 	##TOP MENU:
 	ObjectEnv$topMenu <- tkmenu(ObjectEnv$tt) # Create a menu
